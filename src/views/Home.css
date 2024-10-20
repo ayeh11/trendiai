@@ -1,0 +1,93 @@
+/* Home page */
+.container-home {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    padding-bottom: 100px;
+    background-color: var(--color-navy);
+  }
+  
+  .subcontainers-home {
+    background-color: var(--color-navy);
+    text-align: center;
+    padding: 30px 5px;
+    position: relative;
+  }
+
+  .subcontainers-title {
+    margin-top: 70px;
+  }
+  
+  .container-roadmap {
+    display: flex;
+    flex-direction: column;
+    background-color:  var(--color-white);
+    padding: 0px 100px;
+    height: auto;
+  }
+  
+  .step {
+    display: flex;
+    align-items: center;
+    margin-bottom: 50px;
+  }
+  
+  .step-left .step-content {
+    text-align: left;
+    flex-direction: row;
+  }
+  
+  .step-right .step-content {
+    text-align: right;
+    flex-direction: row-reverse;
+  }
+  
+  .step-content {
+    display: flex;
+    width: 100%;
+  }
+  
+  .step-content img {
+    width: 480px;
+    height: 300px;
+  }
+  
+  .step-words {
+    padding: 0px 20px;
+    margin-top: 50px;
+  }
+  
+  .diagonal {
+    content: '';
+    position: relative;
+    width: 100%;
+    height: 15vh;
+    background: linear-gradient(5deg,  var(--color-white) 50%, var(--color-navy) 50%);
+  }
+  
+  .upside-diagonal {
+    background: linear-gradient(5deg, var(--color-navy) 50%,  var(--color-white) 50%);
+  }
+  
+  .logo {
+    width: 150px;
+    margin-bottom: 20px;
+  }
+
+@media (max-width: 600px) {
+.container-home {
+    margin-top: 220px;
+}
+
+.step {
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.arrow-img {
+    margin-left: 0;
+    margin-top: 10px;
+    align-self: flex-start;
+}
+}

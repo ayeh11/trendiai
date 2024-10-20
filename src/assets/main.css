@@ -1,0 +1,45 @@
+@import './base.css';
+
+body, p {
+  font-family: 'Your Preferred Font', sans-serif;
+  font-size: 1rem;
+  line-height: 1.5;
+  margin: 0; /* Reset default margin */
+  padding: 0; /* Reset default padding */
+  width: 100%;
+}
+
+#app {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  min-height: 100vh; /* Ensure the app takes full viewport height */
+}
+
+main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  min-height: 0; /* Override any minimum height restrictions */
+  box-sizing: border-box; /* Include padding in the element's total width and height */
+}
+
+/* Ensure proper stretching on larger screens */
+@media (min-width: 1024px) {
+  body {
+    display: flex;
+    place-items: center;
+    width: 100%; /* Ensure body takes full width */
+  }
+
+  #app {
+    display: grid;
+    width: 100%; /* Ensure #app takes full width */
+  }
+
+  main {
+    grid-column: span 2; /* Ensure main spans both columns */
+    width: 100%;
+  }
+}

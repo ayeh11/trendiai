@@ -1,0 +1,46 @@
+.logo {
+  display: block;
+  margin: 0 auto 2rem;
+}
+
+.have-an-account {
+  margin-top: 1rem;
+  display: flex;
+  font-size: 1.2rem;
+}
+
+.create-account-link {
+  color: var(--color-dark-navy);
+  text-decoration: underline;
+}
+
+.create-account-link:hover {
+  color: var(--color-light-navy);
+}
+
+.greetings {
+  text-align: center;
+}
+
+@media (max-width: 600px) {
+  .logo {
+    width: 200px;
+    height: 200px;
+  }
+
+  input[type="text"],
+  input[type="password"],
+  input[type="email"] {
+    width: 80%;
+    font-size: 1rem;
+  }
+
+  button {
+    padding: 10px;
+    font-size: 0.9rem;
+  }
+
+  .login-container {
+    margin-top: 1rem;
+  }
+}
