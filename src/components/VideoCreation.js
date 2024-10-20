@@ -16,7 +16,7 @@ const VideoCreation = () => {
 
   const [instructions] = useState([
     'Click on empty clip',
-    "Upload your video or photo. If it's a video, use the slider to set the start and end times. The clip will automatically adjust to the trend's length.",
+    "Upload your video or photo. If it's a video, use the slider to set the start time. The clip will automatically adjust to the trend's length.",
     "Download the final video once all clips are filled. It's now ready for social media!",
   ]);
 
@@ -25,17 +25,20 @@ const VideoCreation = () => {
   const [selectedContainer, setSelectedContainer] = useState(null);
   const [contents, setContents] = useState([]);
   const [videoDuration, setVideoDuration] = useState(0);
-  const [sliderValues, setSliderValues] = useState([0, 10]);
+  const [sliderValue, setSliderValue] = useState(0); // Single value for start time
   const [thumbnails, setThumbnails] = useState([]);
   const [startTime, setStartTime] = useState(0);
   const [endTime, setEndTime] = useState(10);
   const [allContentsFilled, setAllContentsFilled] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [errorMessage, setErrorMessage] = useState(''); // For error handling
+
+  const maxFileSize = 100 * 1024 * 1024; // 100MB, adjust as needed
 
   const fileInputRef = useRef(null);
   const videoPlayerRef = useRef(null);
 
-  // Move calculateDimensions here to avoid initialization issues
+  // Calculate dimensions for the timeline
   const calculateDimensions = () => {
     const timelineContainer = document.querySelector('.timeline-container-vc');
     if (timelineContainer) {
@@ -53,14 +56,54 @@ const VideoCreation = () => {
     return minutes * 60 + seconds;
   };
 
+  const selectContainer = (index) => {
+    setSelectedContainer(index);
+    setStartTime(timeToSeconds(timestamps[index]));
+    setEndTime(timeToSeconds(timestamps[index + 1]));
+    setErrorMessage(''); // Clear previous errors
+    // Reset upload state when selecting a new container
+    setUploadedFile(null);
+    setUploadedFileType(null);
+    if (fileInputRef.current) fileInputRef.current.value = null;
+  };
+
   const handleFileUpload = (event) => {
     const file = event.target.files[0];
+    if (!file) return;
+
+    // Start a new upload attempt, clear previous errors
+    setErrorMessage('');
+
+    // If uploading a video, ensure a clip is selected
+    if (file.type.startsWith('video') && selectedContainer === null) {
+      setErrorMessage('Please select a clip before uploading a video.');
+      setUploadedFile(null);
+      setUploadedFileType(null);
+      return;
+    }
+
+    // Check file size
+    if (file.size > maxFileSize) {
+      setErrorMessage('Uploaded video is too large to be stored in local memory.');
+      setUploadedFile(null);
+      setUploadedFileType(null);
+      return;
+    }
+
+    // Check for supported file types
+    if (!file.type.startsWith('image') && !file.type.startsWith('video')) {
+      setErrorMessage('Unsupported file type.');
+      setUploadedFile(null);
+      setUploadedFileType(null);
+      return;
+    }
 
     const reader = new FileReader();
     reader.readAsDataURL(file);
     reader.onload = () => {
       const dataURL = reader.result;
       setUploadedFile(dataURL);
+      setErrorMessage(''); // Clear any existing errors
 
       if (file.type.startsWith('image')) {
         setUploadedFileType('image');
@@ -75,16 +118,64 @@ const VideoCreation = () => {
         if (videoPlayerRef.current) {
           videoPlayerRef.current.src = dataURL;
         }
-      } else {
-        console.error('Unsupported file type');
       }
     };
   };
 
-  const selectContainer = (index) => {
-    setSelectedContainer(index);
-    setStartTime(timeToSeconds(timestamps[index]));
-    setEndTime(timeToSeconds(timestamps[index + 1]));
+  const handleFileDrop = (event) => {
+    event.preventDefault();
+    const file = event.dataTransfer.files[0];
+    if (!file) return;
+
+    // Start a new upload attempt, clear previous errors
+    setErrorMessage('');
+
+    // If uploading a video, ensure a clip is selected
+    if (file.type.startsWith('video') && selectedContainer === null) {
+      setErrorMessage('Please select a clip before uploading a video.');
+      setUploadedFile(null);
+      setUploadedFileType(null);
+      return;
+    }
+
+    // Check file size
+    if (file.size > maxFileSize) {
+      setErrorMessage('Uploaded video is too large to be stored in local memory.');
+      setUploadedFile(null);
+      setUploadedFileType(null);
+      return;
+    }
+
+    // Check for supported file types
+    if (!file.type.startsWith('image') && !file.type.startsWith('video')) {
+      setErrorMessage('Unsupported file type.');
+      setUploadedFile(null);
+      setUploadedFileType(null);
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = () => {
+      const dataURL = reader.result;
+      setUploadedFile(dataURL);
+      setErrorMessage(''); // Clear any existing errors
+
+      if (file.type.startsWith('image')) {
+        setUploadedFileType('image');
+        // Generate thumbnail
+        setThumbnails((prevThumbnails) => {
+          const updatedThumbnails = [...prevThumbnails];
+          updatedThumbnails[selectedContainer] = dataURL;
+          return updatedThumbnails;
+        });
+      } else if (file.type.startsWith('video')) {
+        setUploadedFileType('video');
+        if (videoPlayerRef.current) {
+          videoPlayerRef.current.src = dataURL;
+        }
+      }
+    };
   };
 
   const generateThumbnail = (dataURL) => {
@@ -135,12 +226,15 @@ const VideoCreation = () => {
         try {
           processedFile = await trimVideo(
             uploadedFile,
-            sliderValues[0],
-            sliderValues[1]
+            sliderValue,
+            sliderValue + (endTime - startTime)
           );
           setUploadedFile(processedFile);
         } catch (error) {
           console.error('Error during trimVideo process:', error);
+          setErrorMessage('Error processing the video.');
+          setIsSubmitting(false);
+          return;
         }
       }
 
@@ -148,37 +242,44 @@ const VideoCreation = () => {
       updatedContents[selectedContainer] = processedFile;
       setContents(updatedContents);
 
-      const newThumbnail = await generateThumbnail(processedFile);
-      setThumbnails((prevThumbnails) => {
-        const updatedThumbnails = [...prevThumbnails];
-        updatedThumbnails[selectedContainer] = newThumbnail;
-        return updatedThumbnails;
-      });
+      try {
+        const newThumbnail = await generateThumbnail(processedFile);
+        setThumbnails((prevThumbnails) => {
+          const updatedThumbnails = [...prevThumbnails];
+          updatedThumbnails[selectedContainer] = newThumbnail;
+          return updatedThumbnails;
+        });
+      } catch (error) {
+        console.error('Error generating thumbnail:', error);
+      }
 
       // Reset upload box
       setUploadedFile(null);
       setSelectedContainer(null);
       if (fileInputRef.current) fileInputRef.current.value = null;
       setUploadedFileType(null);
+      setErrorMessage(''); // Clear any existing errors
       setIsSubmitting(false); // Stop loading
     }
   };
 
   const playPreview = () => {
     if (videoPlayerRef.current) {
-      videoPlayerRef.current.currentTime = sliderValues[0];
+      videoPlayerRef.current.currentTime = sliderValue;
       videoPlayerRef.current.play();
 
       setTimeout(() => {
         videoPlayerRef.current.pause();
-      }, (sliderValues[1] - sliderValues[0]) * 1000);
+      }, (endTime - startTime) * 1000);
     }
   };
 
-  const handleSliderChange = (values) => {
-    setSliderValues(values);
+  const handleSliderChange = (value) => {
+    setSliderValue(value);
+    setStartTime(value);
+    setEndTime(value + (timeToSeconds(timestamps[selectedContainer + 1]) - timeToSeconds(timestamps[selectedContainer])));
     if (videoPlayerRef.current) {
-      videoPlayerRef.current.currentTime = values[0];
+      videoPlayerRef.current.currentTime = value;
     }
   };
 
@@ -247,46 +348,11 @@ const VideoCreation = () => {
     return mime;
   };
 
-  const handleFileDrop = (event) => {
-    event.preventDefault();
-    const file = event.dataTransfer.files[0];
-    // Use the same logic as handleFileUpload
-    const reader = new FileReader();
-    reader.readAsDataURL(file);
-    reader.onload = () => {
-      const dataURL = reader.result;
-      setUploadedFile(dataURL);
-
-      if (file.type.startsWith('image')) {
-        setUploadedFileType('image');
-        // Generate thumbnail
-        setThumbnails((prevThumbnails) => {
-          const updatedThumbnails = [...prevThumbnails];
-          updatedThumbnails[selectedContainer] = dataURL;
-          return updatedThumbnails;
-        });
-      } else if (file.type.startsWith('video')) {
-        setUploadedFileType('video');
-        if (videoPlayerRef.current) {
-          videoPlayerRef.current.src = dataURL;
-        }
-      } else {
-        console.error('Unsupported file type');
-      }
-    };
-  };
-
-  const preventClick = (e) => {
-    if (isSubmitting) {
-      e.stopPropagation();
-      e.preventDefault();
-    }
-  };
-
   useEffect(() => {
     if (tiktok && tiktok.timestamps) {
       const timestampsArray = JSON.parse(tiktok.timestamps);
       setContents(Array(timestampsArray.length - 1).fill(null));
+      setThumbnails(Array(timestampsArray.length - 1).fill(null));
     }
 
     // Load contents from localStorage
@@ -314,11 +380,13 @@ const VideoCreation = () => {
     return <div>Loading...</div>;
   }
 
+  const clipLength = endTime - startTime;
+
   return (
     <div
       className={`grid-container container-vc ${isSubmitting ? 'loading' : ''}`}
-      onClick={preventClick}
-      onKeyDown={preventClick}
+      onClick={isSubmitting ? (e) => e.stopPropagation() : undefined}
+      onKeyDown={isSubmitting ? (e) => e.stopPropagation() : undefined}
     >
       <div className="timeline">
         <div className="image-container-vc">
@@ -366,8 +434,17 @@ const VideoCreation = () => {
                 ref={videoPlayerRef}
                 className="uploaded-video-preview"
                 onLoadedMetadata={() => {
-                  setVideoDuration(videoPlayerRef.current.duration);
-                  setSliderValues([0, videoPlayerRef.current.duration]);
+                  const duration = videoPlayerRef.current.duration;
+                  setVideoDuration(duration);
+                  const clipLength = endTime - startTime;
+                  if (duration < clipLength) {
+                    setErrorMessage('Uploaded video is shorter than the clip length.');
+                    setUploadedFile(null);
+                    setUploadedFileType(null);
+                  } else {
+                    setErrorMessage('');
+                    setSliderValue(0);
+                  }
                 }}
               >
                 <source src={uploadedFile} type="video/mp4" />
@@ -375,26 +452,39 @@ const VideoCreation = () => {
             )}
           </div>
 
-          {uploadedFileType === 'video' && (
+          {/* Display Error Message */}
+          {errorMessage && (
+            <div className="error-message">
+              {errorMessage}
+            </div>
+          )}
+
+          {/* Slider and Submit Button */}
+          {selectedContainer !== null && uploadedFileType === 'video' && uploadedFile && (
             <>
               <div className="slider-container">
                 <div className="play-icon" onClick={playPreview}>
                   ▶
                 </div>
                 <Slider
-                  range
                   min={0}
-                  max={videoDuration}
-                  value={sliderValues}
+                  max={videoDuration - clipLength}
+                  value={sliderValue}
                   onChange={handleSliderChange}
-                  allowCross={false}
+                  railStyle={{ backgroundColor: '#e0e0e0', height: 10 }}
+                  trackStyle={{ backgroundColor: '#5a6dcd', height: 10 }}
+                  handleStyle={{
+                    border: 'none',
+                    backgroundColor: '#161f4e',
+                    width: 20,
+                    height: 20,
+                    marginTop: -5,
+                  }}
                 />
               </div>
-              {selectedContainer !== null && uploadedFile && (
-                <button onClick={submitFile} className="submit-button" disabled={isSubmitting}>
-                  Submit
-                </button>
-              )}
+              <button onClick={submitFile} className="submit-button" disabled={isSubmitting}>
+                Submit
+              </button>
             </>
           )}
         </div>

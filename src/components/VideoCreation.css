@@ -127,11 +127,6 @@
     margin-right: 10px;
   }
   
-  .slider-with-thumbnails {
-    flex-grow: 1;
-    position: relative;
-  }
-  
   .rc-slider {
     margin-bottom: 10px;
   }
@@ -169,18 +164,30 @@
   .error-message {
     color: red;
     margin-top: 10px;
+    text-align: center; /* Center the error message */
   }  
   
   .submit-button, .play-preview-button {
     background-color: #161f4e;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-top: 10px;
   }
   
-  .submit-button:hover, .play-preview-button {
+  .submit-button:hover, .play-preview-button:hover {
     background-color: #5a6dcd;
   }
   
   .download-button {
     background-color: green; 
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 4px;
+    cursor: pointer;
   }
   
   .download-button:hover {
@@ -189,6 +196,11 @@
   
   .clear-button {
     background-color: red; 
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 4px;
+    cursor: pointer;
   }
   
   .clear-button:hover {
@@ -228,4 +240,3 @@
       grid-column: 1 / 2;
     }
   }
-  
