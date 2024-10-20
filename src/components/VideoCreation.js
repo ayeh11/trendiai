@@ -46,37 +46,6 @@ const VideoCreation = () => {
     }
   };
 
-  useEffect(() => {
-    if (tiktok && tiktok.timestamps) {
-      const timestampsArray = JSON.parse(tiktok.timestamps);
-      setContents(Array(timestampsArray.length - 1).fill(null));
-    }
-
-    // Load contents from localStorage
-    const storedContents = localStorage.getItem('contents');
-    if (storedContents) {
-      setContents(JSON.parse(storedContents));
-    }
-
-    window.addEventListener('resize', calculateDimensions);
-    window.addEventListener('beforeunload', resetContentsOnUnload);
-
-    return () => {
-      window.removeEventListener('resize', calculateDimensions);
-      window.removeEventListener('beforeunload', resetContentsOnUnload);
-    };
-  }, [tiktok]);
-
-  useEffect(() => {
-    // Save contents to localStorage whenever contents change
-    localStorage.setItem('contents', JSON.stringify(contents));
-    setAllContentsFilled(contents.every((content) => content !== null));
-  }, [contents]);
-
-  if (!tiktok) {
-    return <div>Loading...</div>;
-  }
-
   const timestamps = JSON.parse(tiktok.timestamps || '[]');
 
   const timeToSeconds = (time) => {
@@ -313,6 +282,37 @@ const VideoCreation = () => {
       e.preventDefault();
     }
   };
+
+  useEffect(() => {
+    if (tiktok && tiktok.timestamps) {
+      const timestampsArray = JSON.parse(tiktok.timestamps);
+      setContents(Array(timestampsArray.length - 1).fill(null));
+    }
+
+    // Load contents from localStorage
+    const storedContents = localStorage.getItem('contents');
+    if (storedContents) {
+      setContents(JSON.parse(storedContents));
+    }
+
+    window.addEventListener('resize', calculateDimensions);
+    window.addEventListener('beforeunload', resetContentsOnUnload);
+
+    return () => {
+      window.removeEventListener('resize', calculateDimensions);
+      window.removeEventListener('beforeunload', resetContentsOnUnload);
+    };
+  }, [tiktok]);
+
+  useEffect(() => {
+    // Save contents to localStorage whenever contents change
+    localStorage.setItem('contents', JSON.stringify(contents));
+    setAllContentsFilled(contents.every((content) => content !== null));
+  }, [contents]);
+
+  if (!tiktok) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <div
