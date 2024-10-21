@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import './TrendAnalysis.css';
 import '../style.css';
@@ -7,8 +7,6 @@ import { toggleFavorite, selectTikTok } from '../store';
 
 const TrendAnalysis = () => {
   const [activeSuggestionIndex, setActiveSuggestionIndex] = useState(null);
-  
-  const { tiktokName } = useParams(); 
   const dispatch = useDispatch();
   const navigate = useNavigate(); 
   

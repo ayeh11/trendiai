@@ -6,7 +6,7 @@ function About() {
   const [email, setEmail] = useState('');
   const [message, setMessage] = useState('');
   const [responseMessage, setResponseMessage] = useState('');
-  const [dataList, setDataList] = useState([]); // Initial state set to an empty array
+  const [setDataList] = useState([]); // Initial state set to an empty array
 
   // Function to handle form submission and post data to the backend
   const postData = async (event) => {
