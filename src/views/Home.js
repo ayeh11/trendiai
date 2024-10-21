@@ -62,7 +62,7 @@ const Home = () => {
         <h1 className='bold white-text'>Future Functionalities</h1>
         <h3 className='light-grey-text'>We're excited to share some upcoming features that will enhance your experience with Trendi.ai:</h3>
         <ul className="white-text centered-list">
-          <li>Continuous addition of new templates to keep up with the latest trends</li>
+          <li>Customizable templates made by users uploading their own videos</li>
           <li>Personalized trend recommendations based on your company's products</li>
           <li>AI-driven ideas to replicate trends effectively tailored to your business needs</li>
         </ul>
@@ -75,8 +75,8 @@ const Home = () => {
         <h3 className='light-navy-text'>Features that are currently being developed:</h3>
         <ul className="navy-text centered-list">
           <li>Accounts will allow users to 'Favorite' trends while browsing</li>
-          <li>Improved UI to select video segments</li>
-          <li>Customizable templates made by users uploading their own videos</li>
+          <li>Continuous addition of new templates to keep up with the latest trends</li>
+          <li>Download videos from the templates after uploading</li>
         </ul>
       </div>
 
