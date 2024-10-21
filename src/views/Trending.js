@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { useSelector, useDispatch } from 'react-redux'; // Import hooks from react-redux
+import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import './Trending.css';
 import '../style.css';
-import { fetchTikToks, toggleFavorite, selectTikTok } from '../store'; // Import the actions
+import { fetchTikToks, toggleFavorite, selectTikTok } from '../store'; 
+import LoadingCard from '../components/LoadingCard'; 
 
 const Trending = () => {
   const dispatch = useDispatch();
@@ -11,6 +12,7 @@ const Trending = () => {
 
   // Get tiktoks and selected TikTok from Redux state
   const tiktoks = useSelector((state) => state.tiktoks);
+  const error = useSelector((state) => state.tiktoks.error);
   const selectedTikTok = useSelector((state) => state.selectedTikTok);
 
   const [searchName, setSearchName] = useState('');
@@ -29,6 +31,25 @@ const Trending = () => {
   useEffect(() => {
     dispatch(fetchTikToks()); // Dispatch the action to fetch TikToks
   }, [dispatch]);
+
+  if (error) {
+    return <div>Error: {error}</div>;
+  }
+
+  if (!Array.isArray(tiktoks)) {
+    return (
+      <div className="grid-container container-trending">
+        <header className="header">
+          <h1 className='navy-text'>Trending TikToks</h1>
+        </header>
+        <div className="trending-card-container">
+          {Array.from({ length: 5 }, (_, index) => (
+            <LoadingCard key={index} />
+          ))}
+        </div>
+      </div>
+    );
+  }
 
   const handleCardClick = (tiktok) => {
     dispatch(selectTikTok(tiktok)); 
@@ -103,7 +124,7 @@ const Trending = () => {
             </div>
 
             <div className="trending-card-info">
-              <h3 className=" bold navy-text no-margin">{tiktok.name}</h3>
+              <h3 className="bold navy-text no-margin">{tiktok.name}</h3>
               <div className="bubble-container trending-card-bubble no-margin">
                 {parseArray(tiktok.categories).map((category, idx) => (
                   <h3 key={idx} className="bubble">
