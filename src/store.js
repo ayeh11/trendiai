@@ -1,63 +1,88 @@
-import { configureStore, createSlice } from '@reduxjs/toolkit';
+import { createSlice, createAsyncThunk, configureStore, combineReducers } from '@reduxjs/toolkit';
 import axios from 'axios';
+import { persistReducer, persistStore } from 'redux-persist';
+import storage from 'redux-persist/lib/storage';
 
-// Initial state
-const initialState = {
-  tiktoks: [],
-  selectedTikTok: null,
-  error: null
-};
+export const fetchTikToks = createAsyncThunk('tiktoks/fetchTikToks', async (_, { rejectWithValue }) => {
+  try {
+    const response = await axios.get('https://trendiai-backend.onrender.com/api/v1/tiktoks');
+    const tiktoks = Array.isArray(response.data.data) ? response.data.data : [];
+    return tiktoks;
+  } catch (error) {
+    return rejectWithValue('Failed to fetch TikToks');
+  }
+});
 
-// Slice: Handles state, actions, and reducers
-const tiktokSlice = createSlice({
+const tiktoksSlice = createSlice({
   name: 'tiktoks',
-  initialState,
+  initialState: [],
   reducers: {
-    setTikToks: (state, action) => {
-      state.tiktoks = action.payload;
-    },
-    setSelectedTikTok: (state, action) => {
-      state.selectedTikTok = action.payload;
-    },
-    toggleFavoriteInState: (state, action) => {
-      const tiktok = state.tiktoks.find(t => t.name === action.payload);
+    selectTikTok: (state, action) => action.payload,
+    toggleFavorite: (state, action) => {
+      const tiktok = state.find(t => t.name === action.payload);
       if (tiktok) {
         tiktok.favorite = !tiktok.favorite;
       }
     },
-    setError: (state, action) => {
-      state.error = action.payload;
-    }
+  },
+  extraReducers: (builder) => {
+    builder
+      .addCase(fetchTikToks.fulfilled, (state, action) => action.payload)
+      .addCase(fetchTikToks.rejected, (state, action) => {
+      });
   }
 });
+export const { selectTikTok, toggleFavorite } = tiktoksSlice.actions;
 
-// Export actions from the slice
-export const { setTikToks, setSelectedTikTok, toggleFavoriteInState, setError } = tiktokSlice.actions;
+const selectedTikTokSlice = createSlice({
+    name: 'selectedTikTok',
+    initialState: null,
+    reducers: {
+      setSelectedTikTok: (state, action) => action.payload,
+    },
+  });
+  export const { setSelectedTikTok } = selectedTikTokSlice.actions;
 
-// Async actions 
-export const fetchTikToks = () => async (dispatch) => {
-  try {
-    const response = await axios.get('https://trendiai-backend.onrender.com/api/v1/tiktoks');
-    const tiktoks = response.data.data;
-    dispatch(setTikToks(tiktoks));
-  } catch (error) {
-    dispatch(setError('Failed to fetch TikToks'));
-    console.error('Failed to fetch TikToks:', error);
-  }
+const errorSlice = createSlice({
+  name: 'error',
+  initialState: null,
+  reducers: {
+    setError: (state, action) => action.payload,
+  },
+});
+export const { setError } = errorSlice.actions;
+
+const rootReducer = combineReducers({
+  tiktoks: tiktoksSlice.reducer,
+  selectedTikTok: selectedTikTokSlice.reducer,
+  error: errorSlice.reducer,
+});
+
+const persistConfig = {
+  key: 'root',
+  storage,
+  whitelist: ['tiktoks'], // Only persist the 'tiktoks' slice
 };
 
-export const toggleFavorite = (tiktokName) => (dispatch) => {
-  dispatch(toggleFavoriteInState(tiktokName));
-};
+const persistedReducer = persistReducer(persistConfig, rootReducer);
 
-export const selectTikTok = (tiktok) => (dispatch) => {
-  dispatch(setSelectedTikTok(tiktok));
-};
-
-// Create the Redux store using configureStore
 const store = configureStore({
-  reducer: tiktokSlice.reducer,
-  devTools: process.env.NODE_ENV !== 'production', // Enable Redux DevTools in development
+  reducer: persistedReducer,
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware({
+      serializableCheck: {
+        ignoredActions: [
+          'persist/PERSIST',
+          'persist/REHYDRATE',
+          'persist/PAUSE',
+          'persist/PURGE',
+          'persist/REGISTER'
+        ],
+      },
+    }),
+  devTools: process.env.NODE_ENV !== 'production',
 });
 
+export const persistor = persistStore(store);
 export default store;
+

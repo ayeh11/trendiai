@@ -8,7 +8,7 @@ import LoadingCard from '../components/LoadingCard';
 
 const Trending = () => {
   const dispatch = useDispatch();
-  const navigate = useNavigate(); // Initialize useNavigate
+  const navigate = useNavigate(); 
 
   // Get tiktoks and selected TikTok from Redux state
   const tiktoks = useSelector((state) => state.tiktoks);
@@ -33,10 +33,14 @@ const Trending = () => {
   }, [dispatch]);
 
   if (error) {
-    return <div>Error: {error}</div>;
-  }
-
-  if (!Array.isArray(tiktoks)) {
+    return <div>
+      <div className="grid-container container-trending">
+        <header className="header">
+          <h1 className='navy-text'>Error: {error}</h1>
+        </header>
+      </div>
+    </div>;
+  } else if(!Array.isArray(tiktoks) || tiktoks.length == 0) {
     return (
       <div className="grid-container container-trending">
         <header className="header">
@@ -50,6 +54,7 @@ const Trending = () => {
       </div>
     );
   }
+  // TODO: if load for more than a minute then crash to error
 
   const handleCardClick = (tiktok) => {
     dispatch(selectTikTok(tiktok)); 

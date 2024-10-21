@@ -10,9 +10,7 @@ const VideoCreation = () => {
   const { tiktokName } = useParams();
   const navigate = useNavigate();
 
-  const tiktok = useSelector((state) =>
-    state.tiktoks.find((t) => t.name === tiktokName)
-  );
+  const tiktok = useSelector((state) => state.tiktoks);
 
   const [instructions] = useState([
     'Click on empty clip',
@@ -213,7 +211,6 @@ const VideoCreation = () => {
 
   const trimVideo = async (dataURL, startTime, endTime) => {
     // Implement your video trimming logic here
-    // For the sake of example, we'll return the original dataURL
     return dataURL;
   };
 

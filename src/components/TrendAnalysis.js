@@ -13,9 +13,8 @@ const TrendAnalysis = () => {
   const navigate = useNavigate(); 
   
   // Get the selected TikTok from Redux state
-  const tiktok = useSelector((state) =>
-    state.tiktoks.find((t) => t.name === tiktokName)
-  );
+  
+  const tiktok = useSelector((state) => state.tiktoks);
 
   const accountTypes = ['beauty salon account', 'jewelry seller account', 'cheese factory'];
 
