@@ -105,13 +105,13 @@ p { font-size: 14px; }
 .left-align {text-align: left;}
 .margin-bottom {margin-bottom: 10px;}
 
-.white-text { color: var(--color-white); }
-.navy-text { color: var(--color-navy); }
-.light-navy-text { color: var(--color-light-navy); }
-.dark-navy-text { color: var(--color-dark-navy); }
-.grey-text { color: var(--color-grey); }
-.light-grey-text { color: var(--color-light-grey); }
-.dark-grey-text { color: var(--color-dark-grey); }
+.white-text { color: var(--color-white) !important;}
+.navy-text { color: var(--color-navy) !important; }
+.light-navy-text { color: var(--color-light-navy) !important; }
+.dark-navy-text { color: var(--color-dark-navy) !important; }
+.grey-text { color: var(--color-grey) !important; }
+.light-grey-text { color: var(--color-light-grey) !important; }
+.dark-grey-text { color: var(--color-dark-grey) !important; }
 
 p.error-text {
   color: var(--color-red);
