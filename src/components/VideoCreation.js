@@ -1,9 +1,10 @@
+// VideoCreation.js
 import React, { useState, useEffect, useRef } from 'react';
 import { useSelector } from 'react-redux';
 import axios from 'axios';
-import Slider from 'rc-slider';
-import 'rc-slider/assets/index.css';
+import CustomSlider from './CustomSlider'; // New import
 import './VideoCreation.css'; // Ensure this imports your CSS
+import './CustomSlider.css'; // Ensure this imports the slider CSS
 
 const VideoCreation = () => {
   const tiktok = useSelector((state) => state.tiktoks);
@@ -19,10 +20,10 @@ const VideoCreation = () => {
   const [selectedContainer, setSelectedContainer] = useState(null);
   const [contents, setContents] = useState([]);
   const [videoDuration, setVideoDuration] = useState(0);
-  const [sliderValue, setSliderValue] = useState(0); // Single value for start time
-  const [thumbnails, setThumbnails] = useState([]);
+  const [clipLength, setClipLength] = useState(0); // New state
   const [startTime, setStartTime] = useState(0);
   const [endTime, setEndTime] = useState(10);
+  const [thumbnails, setThumbnails] = useState([]);
   const [allContentsFilled, setAllContentsFilled] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState(''); // For error handling
@@ -43,18 +44,37 @@ const VideoCreation = () => {
     }
   };
 
-  const timestamps = JSON.parse(tiktok.timestamps || '[]');
-
   const timeToSeconds = (time) => {
+    if (!time || typeof time !== 'string') {
+      console.error('Invalid time format:', time);
+      return 0;
+    }
+
     const [minutes, seconds] = time.split(':').map(Number);
     return minutes * 60 + seconds;
   };
 
+  const timestamps = tiktok && tiktok.timestamps ? JSON.parse(tiktok.timestamps) : [];
+
   const selectContainer = (index) => {
-    setSelectedContainer(index);
-    setStartTime(timeToSeconds(timestamps[index]));
-    setEndTime(timeToSeconds(timestamps[index + 1]));
-    setErrorMessage(''); // Clear previous errors
+    // Ensure the selected timestamp and the next timestamp exist
+    if (timestamps[index] && timestamps[index + 1]) {
+      const start = timeToSeconds(timestamps[index]);
+      const end = timeToSeconds(timestamps[index + 1]);
+      const calculatedClipLength = end - start; // Calculate the clip length based on the selected clip
+
+      setSelectedContainer(index);
+      setStartTime(0);
+      setEndTime(calculatedClipLength);
+      setClipLength(calculatedClipLength); // Set clipLength
+      setErrorMessage(''); // Clear previous errors
+
+      console.log(`Selected clip length: ${calculatedClipLength} seconds`);
+    } else {
+      console.error('Invalid timestamp selected', index);
+      setErrorMessage('Invalid timestamp selected.');
+    }
+
     // Reset upload state when selecting a new container
     setUploadedFile(null);
     setUploadedFileType(null);
@@ -212,16 +232,12 @@ const VideoCreation = () => {
 
   const submitFile = async () => {
     if (selectedContainer !== null && uploadedFile) {
-      setIsSubmitting(true); // Start loading
+      setIsSubmitting(true);
       let processedFile = uploadedFile;
 
       if (uploadedFileType === 'video') {
         try {
-          processedFile = await trimVideo(
-            uploadedFile,
-            sliderValue,
-            sliderValue + (endTime - startTime)
-          );
+          processedFile = await trimVideo(uploadedFile, startTime, endTime);
           setUploadedFile(processedFile);
         } catch (error) {
           console.error('Error during trimVideo process:', error);
@@ -258,21 +274,22 @@ const VideoCreation = () => {
 
   const playPreview = () => {
     if (videoPlayerRef.current) {
-      videoPlayerRef.current.currentTime = sliderValue;
+      videoPlayerRef.current.currentTime = startTime;
       videoPlayerRef.current.play();
+
+      const playDuration = (endTime - startTime) * 1000; // Convert to milliseconds
 
       setTimeout(() => {
         videoPlayerRef.current.pause();
-      }, (endTime - startTime) * 1000);
+      }, playDuration);
     }
   };
 
-  const handleSliderChange = (value) => {
-    setSliderValue(value);
-    setStartTime(value);
-    setEndTime(value + (timeToSeconds(timestamps[selectedContainer + 1]) - timeToSeconds(timestamps[selectedContainer])));
+  const handleSliderChange = (newStartTime, newEndTime) => {
+    setStartTime(newStartTime);
+    setEndTime(newEndTime);
     if (videoPlayerRef.current) {
-      videoPlayerRef.current.currentTime = value;
+      videoPlayerRef.current.currentTime = newStartTime;
     }
   };
 
@@ -369,11 +386,17 @@ const VideoCreation = () => {
     setAllContentsFilled(contents.every((content) => content !== null));
   }, [contents]);
 
+  // Optional: Debugging logs
+  useEffect(() => {
+    console.log('Video Duration:', videoDuration);
+    console.log('Clip Length:', clipLength);
+    console.log('Start Time:', startTime);
+    console.log('End Time:', endTime);
+  }, [videoDuration, clipLength, endTime, startTime]);
+
   if (!tiktok) {
     return <div>Loading...</div>;
   }
-
-  const clipLength = endTime - startTime;
 
   return (
     <div
@@ -429,14 +452,13 @@ const VideoCreation = () => {
                 onLoadedMetadata={() => {
                   const duration = videoPlayerRef.current.duration;
                   setVideoDuration(duration);
-                  const clipLength = endTime - startTime;
-                  if (duration < clipLength) {
+                  if (duration < clipLength) { // Use clipLength
                     setErrorMessage('Uploaded video is shorter than the clip length.');
                     setUploadedFile(null);
                     setUploadedFileType(null);
                   } else {
                     setErrorMessage('');
-                    setSliderValue(0);
+                    setEndTime(startTime + clipLength); // Initialize endTime
                   }
                 }}
               >
@@ -453,40 +475,31 @@ const VideoCreation = () => {
           )}
 
           {/* Slider and Submit Button */}
-          {selectedContainer !== null && uploadedFileType === 'video' && uploadedFile && (
+          {selectedContainer !== null && uploadedFileType === 'video' && uploadedFile && clipLength > 0 && (
             <>
-              <div className="slider-container">
+              <div className="slider-container margin-bottom">
                 <div className="play-icon" onClick={playPreview}>
                   ▶
                 </div>
-                <Slider
-                  min={0}
-                  max={videoDuration - clipLength}
-                  value={sliderValue}
+                <CustomSlider
+                  videoDuration={videoDuration}
+                  clipLength={clipLength}
+                  startTime={startTime}
                   onChange={handleSliderChange}
-                  railStyle={{ backgroundColor: '#e0e0e0', height: 10 }}
-                  trackStyle={{ backgroundColor: '#5a6dcd', height: 10 }}
-                  handleStyle={{
-                    border: 'none',
-                    backgroundColor: '#161f4e',
-                    width: 20,
-                    height: 20,
-                    marginTop: -5,
-                  }}
                 />
               </div>
-              <button onClick={submitFile} className="submit-button" disabled={isSubmitting}>
-                Submit
+              <button onClick={submitFile} disabled={isSubmitting}>
+                Upload
               </button>
             </>
           )}
         </div>
       </div>
 
-      <div className="right-box">
+      <div className="info-and-instructions">
         <div>
           <h1 className="bold dark-navy-text">{tiktok.name || 'Untitled'}</h1>
-          <h3 className="grey-text">{tiktok.description || 'No description available'}</h3>
+          <h3 className="navy-text">{tiktok.description || 'No description available'}</h3>
         </div>
 
         <div className="small-box instructions-text">

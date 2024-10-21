@@ -1,5 +1,5 @@
-/* Existing CSS from your provided code */
 .container-vc {
+    margin-top: 120px;
     grid-template-columns: 3fr 1fr !important;
   }
   
@@ -125,93 +125,23 @@
     font-size: 24px;
     cursor: pointer;
     margin-right: 10px;
+    color: var(--color-grey);
   }
-  
-  .rc-slider {
-    margin-bottom: 10px;
-  }
-  
-  .rc-slider-rail {
-    background-color: #e0e0e0;
-    height: 10px;
-  }
-  
-  .rc-slider-track {
-    background-color: #5a6dcd;
-    height: 10px;
-  }
-  
-  .rc-slider-handle {
-    background-color: #161f4e;
-    border: none;
-    width: 20px;
-    height: 20px;
-    margin-top: -5px;
-    cursor: pointer;
-  }
-  
-  .thumbnails-container {
-    display: flex;
-    justify-content: space-between;
-  }
-  
-  .thumbnail-image {
-    width: calc(100% / 10); /* Adjust based on number of thumbnails */
-    height: 60px; /* Adjust as needed */
-    object-fit: cover;
-  }
-  
-  .error-message {
-    color: red;
-    margin-top: 10px;
-    text-align: center; /* Center the error message */
-  }  
-  
-  .submit-button, .play-preview-button {
-    background-color: #161f4e;
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 4px;
-    cursor: pointer;
-    margin-top: 10px;
-  }
-  
-  .submit-button:hover, .play-preview-button:hover {
-    background-color: #5a6dcd;
+
+  .play-icon:hover {
+    color: var(--color-darker-grey);
   }
   
   .download-button {
-    background-color: green; 
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 4px;
-    cursor: pointer;
+    background-color: rgb(0, 67, 0); 
   }
   
-  .download-button:hover {
-    background-color: rgb(60, 179, 113); 
-  }
-  
-  .clear-button {
-    background-color: red; 
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 4px;
-    cursor: pointer;
-  }
-  
-  .clear-button:hover {
-    background-color: rgb(255, 99, 71); 
-  }
-  
-  .right-box {
+  .info-and-instructions {
     grid-column: 2 / 3;
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
+    text-align: center;
   }
   
   .instructions-text {
