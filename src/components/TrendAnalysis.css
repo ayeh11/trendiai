@@ -94,10 +94,6 @@
     margin-top: 10px;
     width: 100%;
   }
-
-  .button-ta:hover {
-    background-color: var(--color-light-navy);
-  }
   
   .disabled-button-ta {
     margin-top: 10px;

@@ -51,7 +51,7 @@ const Footer = ({ onToggleVisibility }) => {
         <div className="footer-links">
           <div className="footer-column">
             <Link to="/trending"><button className="footer-button">Trending</button></Link>
-            <Link to="/upload"><button className="footer-button">Create Template</button></Link>
+            <Link to="/createtemplates"><button className="footer-button">Create Template</button></Link>
             <Link to="/login"><button className="footer-button">Login</button></Link>
           </div>
           <div className="footer-column">

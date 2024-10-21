@@ -14,10 +14,6 @@
   text-decoration: underline;
 }
 
-.create-account-link:hover {
-  color: var(--color-light-navy);
-}
-
 .greetings {
   text-align: center;
 }

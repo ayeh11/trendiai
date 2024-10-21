@@ -40,6 +40,7 @@
 
 .img-button:hover{
   background-color: var(--color-dark-navy) !important;
+  filter: brightness(1) !important;
 }
 
 @media (max-width: 600px) {
