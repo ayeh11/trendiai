@@ -7,9 +7,6 @@ import 'rc-slider/assets/index.css';
 import './VideoCreation.css'; // Ensure this imports your CSS
 
 const VideoCreation = () => {
-  const { tiktokName } = useParams();
-  const navigate = useNavigate();
-
   const tiktok = useSelector((state) => state.tiktoks);
 
   const [instructions] = useState([
