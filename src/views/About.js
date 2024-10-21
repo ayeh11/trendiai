@@ -38,7 +38,7 @@ function About() {
   // Fetch data when the component mounts
   useEffect(() => {
     fetchData();
-  }, []);
+  }, [fetchData]);
 
   // Auto-expand textarea as user types
   const autoExpandTextarea = (e) => {

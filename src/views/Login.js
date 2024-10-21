@@ -17,7 +17,7 @@ const Login = () => {
   });
 
   const checkEmail = () => {
-    const emailPattern = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
+    const emailPattern = /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/;
     const isValidEmail = emailPattern.test(loginInfo.email);
     setLoginInfo((prev) => ({ ...prev, validEmail: isValidEmail }));
     return isValidEmail;

@@ -36,13 +36,14 @@ const Footer = ({ onToggleVisibility }) => {
   };
 
   useEffect(() => {
+    window.addEventListener('scroll', handleScroll);
     window.addEventListener('scroll', onScroll);
-    handleScroll(); // Initial check to set visibility based on the initial scroll position
-
+  
     return () => {
+      window.removeEventListener('scroll', handleScroll);
       window.removeEventListener('scroll', onScroll);
     };
-  }, [isHidden]);
+  }, [isHidden, handleScroll, onScroll]);
 
   return (
     <footer className={`footer ${!isHidden ? 'footer-visible' : ''}`}>

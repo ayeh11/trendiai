@@ -37,7 +37,7 @@ const NavBar = () => {
     return () => {
       window.removeEventListener('scroll', onScroll);
     };
-  }, [lastScrollPosition, ticking]);
+  }, [onScroll, lastScrollPosition, ticking]);
 
   return (
     <nav className={`nav-bar ${isHidden ? 'nav-bar-hidden' : ''}`}>

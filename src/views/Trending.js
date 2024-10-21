@@ -13,7 +13,6 @@ const Trending = () => {
   // Get tiktoks and selected TikTok from Redux state
   const tiktoks = useSelector((state) => state.tiktoks);
   const error = useSelector((state) => state.tiktoks.error);
-  const selectedTikTok = useSelector((state) => state.selectedTikTok);
 
   const [searchName, setSearchName] = useState('');
   const [searchCategories, setSearchCategories] = useState([]);
@@ -40,7 +39,7 @@ const Trending = () => {
         </header>
       </div>
     </div>;
-  } else if(!Array.isArray(tiktoks) || tiktoks.length == 0) {
+  } else if(!Array.isArray(tiktoks) || tiktoks.length === 0) {
     return (
       <div className="grid-container container-trending">
         <header className="header">
