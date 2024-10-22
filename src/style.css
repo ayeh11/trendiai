@@ -99,7 +99,7 @@ h3 { font-size: 18px; }
 p { font-size: 14px; }
 
 .bold { font-weight: bold}
-.title { color: var(--color-white); font-size: 60px; }
+.title { color: var(--color-white); font-size: 72px; }
 .no-margin {margin: 0;}
 .small-margin {margin: 5px;}
 .left-align {text-align: left;}

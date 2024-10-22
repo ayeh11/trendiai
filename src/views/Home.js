@@ -34,12 +34,17 @@ const Home = () => {
 
   return (
     <div className="container-home">
-      <div className="subcontainers-title subcontainers-home">
-        <img src={require('../assets/whiteLogo.png')} alt="Trendi" className="logo" />
-        <h1 className="bold title">Trendi.ai</h1>
-        <h2 className="grey-text">Templates to recreate the latest trends!</h2>
+      <div className="subcontainers-home-img">
+        <div className='subcontainers-overlay'>
+          <div className="subcontainers-home-title">
+            <img src={require('../assets/whiteLogo.png')} alt="Trendi" className="logo" />
+            <h1 className="bold title">Trendi.ai</h1>
+            <h2 className="light-grey-text"> Your AI Guide to Social Media Marketing </h2>
+          </div>
+        </div>
       </div>
 
+      <div className="transition-rect"></div>
       <div className="diagonal"></div>
 
       <div className="container-roadmap">

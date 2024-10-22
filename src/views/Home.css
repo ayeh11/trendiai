@@ -7,7 +7,7 @@
     padding-bottom: 100px;
     background-color: var(--color-navy);
   }
-  
+
   .subcontainers-home {
     background-color: var(--color-navy);
     text-align: center;
@@ -15,8 +15,26 @@
     position: relative;
   }
 
-  .subcontainers-title {
-    margin-top: 70px;
+  .subcontainers-home-title {
+    margin-top: 25vh;
+  }
+  
+  .subcontainers-home-img {
+    background: url('../assets/mainbg.jpg') center center / cover no-repeat;
+    position: relative;
+    height: 90vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .subcontainers-overlay {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    color: white;
+    text-align: center;
   }
   
   .container-roadmap {
@@ -68,6 +86,13 @@
   
   .upside-diagonal {
     background: linear-gradient(5deg, var(--color-navy) 50%,  var(--color-white) 50%);
+  }
+
+  .transition-rect {
+    position: relative;
+    width: 100%;
+    height: 10vh;
+    background: linear-gradient(to bottom, black, var(--color-navy));
   }
   
   .logo {
